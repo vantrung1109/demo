@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="name"
+            type="String" />
+    </data>
+
+
+    <LinearLayout
+        android:id="@+id/root"
+        android:paddingHorizontal="@dimen/_15sdp"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_width="match_parent"
+        android:background="@drawable/wifi_item_normal"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/_10sdp"
+        android:paddingBottom="@dimen/_5sdp"
+        android:layout_marginHorizontal="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        >
+        <ImageView
+            android:layout_width="@dimen/_17sdp"
+            android:layout_height="@dimen/_17sdp"
+            android:src="@drawable/wifi_password"/>
+        <TextView
+            style="@style/text_roboto_medium"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{name}"
+            android:textColor="#063837"
+            android:textSize="@dimen/_12ssp"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_weight="1"/>
+        <ImageView
+            android:layout_width="@dimen/_18sdp"
+            android:layout_height="@dimen/_18sdp"
+            android:background="@drawable/bg_oval"
+            android:padding="@dimen/_2sdp"
+            android:src="@drawable/ic_icon_info"/>
+<!--        <View-->
+<!--            android:focusable="false"-->
+<!--            android:focusableInTouchMode="false"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="1dp"-->
+<!--            android:background="#969798"/>-->
+    </LinearLayout>
+</layout>

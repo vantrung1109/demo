@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="item_header_height">@dimen/_63sdp</dimen>
+    <dimen name="item_header_height_2">@dimen/_42sdp</dimen>
+    <dimen name="item_footer_height">@dimen/_30sdp</dimen>
+    <dimen name="item_food_height">@dimen/_21sdp</dimen>
+</resources>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+<!--    <item-->
+<!--        android:bottom="@dimen/_12sdp">-->
+<!--        <shape>-->
+<!--            <solid android:color="@color/white" />-->
+<!--            <corners android:topLeftRadius="10dp"-->
+<!--                android:topRightRadius="10dp"-->
+<!--                android:bottomLeftRadius="10dp"-->
+<!--                android:bottomRightRadius="10dp" />-->
+<!--        </shape>-->
+
+<!--    </item>-->
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="0dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_15sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_30sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_45sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_60sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_75sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_90sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_105sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_120sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+    <item
+        android:width="@dimen/_15sdp"
+        android:height="@dimen/_15sdp"
+        android:gravity="bottom"
+        android:left="@dimen/_135sdp">
+        <shape android:shape="oval">
+            <solid android:color="@color/app_bg" />
+            <corners android:radius="10dp" />
+        </shape>
+
+    </item>
+
+
+</layer-list>

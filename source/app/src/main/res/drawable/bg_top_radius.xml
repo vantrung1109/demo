@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <corners android:topLeftRadius="@dimen/_7sdp"
+        android:topRightRadius="@dimen/_7sdp"
+        android:bottomLeftRadius="0dp"
+        android:bottomRightRadius="0dp"/>
+<!--    <solid android:color="@color/red"/>-->
+<!--    <solid android:color="#FFFFFF"/> &lt;!&ndash; Màu nền &ndash;&gt;-->
+</shape>

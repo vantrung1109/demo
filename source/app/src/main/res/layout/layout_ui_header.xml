@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="batteryPercent"
+            type="Integer" />
+        <variable
+            name="leftTitle"
+            type="androidx.databinding.ObservableField&lt;String>" />
+        <variable
+            name="printerId"
+            type="androidx.databinding.ObservableField&lt;String>" />
+        <variable
+            name="iconTitle"
+            type="androidx.databinding.ObservableField&lt;android.graphics.Bitmap>" />
+        <variable
+            name="centerTitle"
+            type="androidx.databinding.ObservableField&lt;String>" />
+        <import type="android.view.View"/>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:paddingVertical="@dimen/_2sdp"
+        android:paddingHorizontal="@dimen/_3sdp"
+        android:background="#999999"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:visibility="@{leftTitle != null &amp;&amp; !leftTitle.empty ? View.VISIBLE : View.GONE}"
+            android:id="@+id/icon_title"
+            android:layout_width="@dimen/_8sdp"
+            android:layout_height="@dimen/_8sdp"
+            android:layout_gravity="left|center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/left_title"
+            android:layout_marginEnd="@dimen/_3sdp"
+            app:imageBase64="@{iconTitle}"
+            app:tint="@color/white"/>
+
+
+        <TextView
+            android:textColor="@color/white"
+            android:id="@+id/left_title"
+            android:text="@{leftTitle}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_8ssp"
+            android:fontFamily="@font/sf_regular"
+            android:textFontWeight="500"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/icon_title"
+            android:layout_marginStart="@dimen/_3sdp" />
+        <TextView
+            android:visibility="@{leftTitle != null &amp;&amp; !leftTitle.empty ? View.VISIBLE : View.GONE}"
+            android:textColor="@color/white"
+            android:text="@{'(' + printerId + ')'}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_8ssp"
+            android:fontFamily="@font/sf_regular"
+            android:textFontWeight="500"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/left_title"
+            android:layout_marginStart="@dimen/_3sdp"/>
+        <TextView
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:id="@+id/center_title"
+            android:text="@{centerTitle}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <LinearLayout
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <ImageView
+                android:padding="@dimen/_1sdp"
+                android:id="@+id/bluetooth"
+                android:layout_width="@dimen/_8sdp"
+                android:layout_height="@dimen/_8sdp"
+                android:src="@drawable/bluetooth"
+                tools:ignore="ContentDescription" />
+            <ImageView
+                android:padding="@dimen/_1sdp"
+                android:layout_marginStart="@dimen/_3sdp"
+                android:id="@+id/wifi"
+                android:layout_width="@dimen/_8sdp"
+                android:layout_height="@dimen/_8sdp"
+                android:src="@drawable/wifi_icon_full"
+                tools:ignore="ContentDescription" />
+            <TextView
+                android:textStyle="bold"
+                android:textSize="@dimen/_5ssp"
+                android:layout_gravity="center"
+                android:textColor="@color/white"
+                android:layout_marginStart="@dimen/_3sdp"
+                android:id="@+id/battery_percent"
+                android:text="@{batteryPercent + `%`}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:ignore="ContentDescription" />
+            <ImageView
+                android:padding="@dimen/_1sdp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/_3sdp"
+                android:id="@+id/battery_icon"
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_7sdp"
+                android:src="@drawable/battery_charging"
+                tools:ignore="ContentDescription" />
+            <TextClock
+                android:id="@+id/textClock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:format12Hour="hh:mm a"
+                android:format24Hour="HH:mm"
+                android:textStyle="bold"
+                android:textSize="@dimen/_5ssp"
+                android:textColor="@color/white"
+                android:layout_centerInParent="true"/>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
