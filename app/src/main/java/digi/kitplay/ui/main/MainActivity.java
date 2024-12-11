@@ -54,6 +54,8 @@ import digi.kitplay.ui.main.layout.TVRootLayout;
 import digi.kitplay.utils.DeviceUtils;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -122,7 +124,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
             // Kiểm tra xem có hành động nào cần xử lý không
             boolean hasPendingAction = false;
             for (int i = 0; i < actionEntities.size(); i++) {
-                Timber.tag("ObserveAction").e("Action %s: %s", i, actionEntities.get(i).getStatus());
+                long timestamp = actionEntities.get(i).getTimestamp();
+                int status = actionEntities.get(i).getStatus();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = dateFormat.format(new Date(timestamp));
+                Timber.tag("ObserveAction").e("Action : Timestamp: %s, Status: %d", formattedDate, status);
             }
             for (ActionEntity action : actionEntities) {
                 if (action.getStatus() == 0) { // Nếu có hành động PENDING

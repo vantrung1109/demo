@@ -38,7 +38,7 @@ public interface DbActionDao {
     void delete(ActionEntity entity);
 
     // Lấy hành động chưa xử lý (status = 0), theo thứ tự thời gian
-    @Query("SELECT * FROM db_actions WHERE status = 0 ORDER BY timestamp ASC LIMIT 1")
+    @Query("SELECT * FROM db_actions WHERE status = 0 ORDER BY timestamp DESC LIMIT 1")
     ActionEntity getNextAction();
 
     // Cập nhật trạng thái của action
