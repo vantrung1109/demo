@@ -171,11 +171,9 @@ public class MainViewModel extends BaseViewModel {
                                 // Sử dụng Random để xác định thành công hoặc thất bại
                                 boolean isSuccess = new Random().nextBoolean();
                                 if (isSuccess) {
-                                    Timber.tag("MockAPI").e("Action %s sent successfully", actionEntity.getId());
                                     repository.getSqLiteService().updateActionStatus(actionEntity.getId(), 2);
                                     callback.doSuccess(actionEntity); // Thành công
                                 } else {
-                                    Timber.tag("MockAPI").e("Action %s failed to send", actionEntity.getId());
                                     repository.getSqLiteService().updateActionStatus(actionEntity.getId(), 0);
                                     callback.doFail(); // Thất bại
                                 }
