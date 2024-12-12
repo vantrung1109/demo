@@ -73,15 +73,7 @@ public class AppDbService implements DbService {
         });
     }
 
-    @Override
-    public Observable<ActionEntity> getNextPendingAction() {
-        return Observable.fromCallable(new Callable<ActionEntity>() {
-            @Override
-            public ActionEntity call() throws Exception {
-                return mAppDatabase.getDbActionDao().getNextAction();
-            }
-        });
-    }
+
 
     @Override
     public Observable<Boolean> deleteAction(ActionEntity action) {

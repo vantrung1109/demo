@@ -31,15 +31,20 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.content.pm.PackageInfoCompat;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import digi.kitplay.BR;
 import digi.kitplay.BuildConfig;
 import digi.kitplay.MVVMApplication;
 import digi.kitplay.R;
-import digi.kitplay.data.AppRepository;
-import digi.kitplay.data.Repository;
 import digi.kitplay.data.download.Download;
 import digi.kitplay.data.download.DownloadProgressListener;
-import digi.kitplay.data.local.sqlite.AppDbService;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
 import digi.kitplay.data.model.db.ActionEntity;
 import digi.kitplay.databinding.ActivityMainBinding;
@@ -52,14 +57,6 @@ import digi.kitplay.ui.main.dialog.KeyboardDialog;
 import digi.kitplay.ui.main.layout.HeightProvider;
 import digi.kitplay.ui.main.layout.TVRootLayout;
 import digi.kitplay.utils.DeviceUtils;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import digi.kitplay.utils.SnowFlakeIdService;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import timber.log.Timber;
@@ -121,54 +118,35 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
 
     public void observeAndProcessActions() {
         viewModel.actionsLiveData.observeForever(actionEntities -> {
-            // Kiểm tra xem có hành động nào cần xử lý không
-            boolean hasPendingAction = false;
+            // Print action by time
             for (int i = 0; i < actionEntities.size(); i++) {
-                long timestamp = actionEntities.get(i).getTimestamp();
                 int status = actionEntities.get(i).getStatus();
+                long timestamp = actionEntities.get(i).getTimestamp();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 String formattedDate = dateFormat.format(new Date(timestamp));
                 Timber.tag("ObserveAction").e("Action : Timestamp: %s, Status: %d", formattedDate, status);
             }
-            for (ActionEntity action : actionEntities) {
-                if (action.getStatus() == 0) { // Nếu có hành động PENDING
-                    hasPendingAction = true;
-                    break;
-                }
-            }
 
-            if (hasPendingAction) {
-                // Nếu còn hành động PENDING, bắt đầu xử lý
-                viewModel.processNextAction(new MainCallback<ActionEntity>() {
-                    @Override
-                    public void doError(Throwable error) {
-                        Timber.tag("MockAPI").e("Error occurred: %s", error.getMessage());
-                    }
-
-                    @Override
-                    public void doFail() {
-                        Timber.tag("MockAPI").e("Action failed to send");
-                        // Sau khi thất bại, tiếp tục kiểm tra hành động kế tiếp
-                        viewModel.processNextAction(this);
-
-                    }
-
-                    @Override
-                    public void doSuccess(ActionEntity actionEntity) {
-                        Timber.tag("MockAPI").e("Action %s sent successfully", actionEntity.getId());
-                        // Pop action và tiếp tục kiểm tra hành động kế tiếp
-                        viewModel.popAction(actionEntity);
-                    }
-
-                    @Override
-                    public void doSuccess() {
-                        Timber.tag("MockAPI").e("Action sent successfully (generic)");
-                    }
-                });
+            // Process action
+            if (actionEntities.size() > 0) {
+                callAPI(actionEntities);
             } else {
-                Timber.tag("MockAPI").e("No pending actions left to process");
+                Timber.tag("ObserveAction").e("No action to process");
             }
+
         });
+    }
+
+    private void callAPI(List<ActionEntity> actionEntities) {
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            boolean isSuccess = new Random().nextBoolean();
+            if (isSuccess) {
+                viewModel.popAction(actionEntities.get(0));
+            } else {
+                callAPI(actionEntities);
+                Timber.tag("ObserveAction").e("Failed to process action");
+            }
+        }, 2000); // Giả lập thời gian chờ 2 giây
     }
 
     private void setupHeader() {

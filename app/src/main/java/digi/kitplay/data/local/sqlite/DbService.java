@@ -16,7 +16,6 @@ public interface DbService {
     LiveData<List<ActionEntity>> getActionsByStatus(String status);
     Observable<Long> insertAction(ActionEntity action);
     Observable<Boolean> updateActionStatus(Long id, Integer newStatus);
-    Observable<ActionEntity> getNextPendingAction();
     Observable<Boolean> deleteAction(ActionEntity action);
     Observable<ActionEntity> findActionById(Long id);
 

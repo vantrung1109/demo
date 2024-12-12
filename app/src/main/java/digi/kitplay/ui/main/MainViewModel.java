@@ -159,31 +159,6 @@ public class MainViewModel extends BaseViewModel {
         );
     }
 
-    public void processNextAction(MainCallback callback) {
-        compositeDisposable.add(
-                repository.getSqLiteService().getNextPendingAction()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(actionEntity -> {
-                            repository.getSqLiteService().updateActionStatus(actionEntity.getId(), 1); // IN_PROGRESS
-                            // Gọi API
-                            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                                // Sử dụng Random để xác định thành công hoặc thất bại
-                                boolean isSuccess = new Random().nextBoolean();
-                                if (isSuccess) {
-                                    repository.getSqLiteService().updateActionStatus(actionEntity.getId(), 2);
-                                    callback.doSuccess(actionEntity); // Thành công
-                                } else {
-                                    repository.getSqLiteService().updateActionStatus(actionEntity.getId(), 0);
-                                    callback.doFail(); // Thất bại
-                                }
-                            }, 2000); // Giả lập thời gian chờ 2 giây
-                        }, throwable -> {
-                            Timber.e(throwable, "No pending actions to process");
-                        })
-        );
-    }
-
     public void observeActions() {
         repository.getSqLiteService().loadAllActionsToLiveData()
                 .observeForever(actionEntities -> {

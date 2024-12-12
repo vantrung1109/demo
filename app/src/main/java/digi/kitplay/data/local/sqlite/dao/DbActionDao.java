@@ -37,15 +37,7 @@ public interface DbActionDao {
     @Delete
     void delete(ActionEntity entity);
 
-    // Lấy hành động chưa xử lý (status = 0), theo thứ tự thời gian
-    @Query("SELECT * FROM db_actions WHERE status = 0 ORDER BY timestamp ASC LIMIT 1")
-    ActionEntity getNextAction();
-
     // Cập nhật trạng thái của action
     @Query("UPDATE db_actions SET status = :newStatus WHERE id = :id")
     void updateActionStatus(Long id, Integer newStatus);
-
-    @Query("SELECT * FROM db_actions WHERE status = 0 ORDER BY timestamp ASC LIMIT 1")
-    ActionEntity getNextPendingAction();
-
 }
