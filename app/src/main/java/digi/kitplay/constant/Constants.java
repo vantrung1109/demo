@@ -79,4 +79,7 @@ public class Constants {
     private Constants(){
 
     }
+
+    public static String ACTION_GET_POST = "ACTION_GET_POST";
+    public static String ACTION_GET_COMMENT = "ACTION_GET_COMMENT";
 }

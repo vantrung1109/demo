@@ -19,6 +19,6 @@ public class ActionEntity extends BaseEntity{
     private String description;
     private Integer status;
     private Long timestamp;
-    private ActionType actionType;
+    private String type;
 }
 

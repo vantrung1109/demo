@@ -38,7 +38,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -47,13 +46,13 @@ import digi.kitplay.BR;
 import digi.kitplay.BuildConfig;
 import digi.kitplay.MVVMApplication;
 import digi.kitplay.R;
+import digi.kitplay.constant.Constants;
 import digi.kitplay.data.download.Download;
 import digi.kitplay.data.download.DownloadProgressListener;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
 import digi.kitplay.data.model.api.response.CommentTest;
 import digi.kitplay.data.model.api.response.PostTest;
 import digi.kitplay.data.model.db.ActionEntity;
-import digi.kitplay.data.model.db.ActionType;
 import digi.kitplay.databinding.ActivityMainBinding;
 import digi.kitplay.databinding.LayoutSocketDisconnectedBinding;
 import digi.kitplay.di.component.ActivityComponent;
@@ -105,10 +104,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
 
-    private Map<ActionType, Consumer<ActionEntity>> apiHandlers = new HashMap<>();
+    private Map<String, Consumer<ActionEntity>> apiHandlers = new HashMap<>();
     private void initializeApiHandlers() {
-        apiHandlers.put(ActionType.POST, this::callPostApi);
-        apiHandlers.put(ActionType.COMMENT, this::callCommentApi);
+        apiHandlers.put(Constants.ACTION_GET_POST, this::callPostApi);
+        apiHandlers.put(Constants.ACTION_GET_COMMENT, this::callCommentApi);
     }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -117,22 +116,22 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         setupHeader();
         initializeApiHandlers();
         viewBinding.btnGetPosts.setOnClickListener(v -> {
-            createAction(ActionType.POST);
+            createAction(Constants.ACTION_GET_POST);
         });
         viewBinding.btnGetComments.setOnClickListener(v -> {
-            createAction(ActionType.COMMENT);
+            createAction(Constants.ACTION_GET_COMMENT);
         });
 
         viewModel.observeActions();
 
     }
 
-    private void createAction(ActionType actionType) {
+    private void createAction(String type) {
         ActionEntity actionEntity = new ActionEntity();
         actionEntity.setId(SnowFlakeIdService.getInstance().nextId());
         actionEntity.setDescription("Action " + System.currentTimeMillis());
         actionEntity.setStatus(0);
-        actionEntity.setActionType(actionType);
+        actionEntity.setType(type);
         actionEntity.setTimestamp(System.currentTimeMillis());
         viewModel.pushAction(actionEntity);
     }
@@ -151,14 +150,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         // Process action
         if (actionEntities.size() > 0) {
             ActionEntity actionEntity = actionEntities.get(0);
-            Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getActionType());
-            if (actionHandler == null) {
-                apiHandlers.get(actionEntity.getActionType());
-                return;
-            }
+            Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getType());
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 actionHandler.accept(actionEntity);
-            }, 2000); // Giả lập thời gian chờ 2 giây
+            }, 2000);
         } else {
             Timber.tag("ObserveAction").e("No action to process");
         }

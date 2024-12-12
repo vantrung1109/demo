@@ -8,7 +8,7 @@ import digi.kitplay.data.local.sqlite.dao.DbUserDao;
 import digi.kitplay.data.model.db.ActionEntity;
 import digi.kitplay.data.model.db.UserEntity;
 
-@Database(entities = {UserEntity.class, ActionEntity.class}, version = 4, exportSchema = false)
+@Database(entities = {UserEntity.class, ActionEntity.class}, version = 5, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract DbUserDao getDbUserDao();
     public abstract DbActionDao getDbActionDao();
