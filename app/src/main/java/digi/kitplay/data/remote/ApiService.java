@@ -1,9 +1,12 @@
 package digi.kitplay.data.remote;
 
+import java.util.List;
+
 import digi.kitplay.data.model.api.ResponseListObj;
 import digi.kitplay.data.model.api.ResponseWrapper;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
 
+import digi.kitplay.data.model.api.response.PostTest;
 import digi.kitplay.data.model.api.response.SocketResponse;
 import digi.kitplay.data.model.api.response.VerifyTokenResponse;
 import digi.kitplay.data.socket.dto.Device;
@@ -26,4 +29,8 @@ public interface ApiService {
     @POST("/v1/device/check-device-id")
     @Headers({"IgnoreAuth:1"})
     Observable<ResponseWrapper<SocketResponse>> checkDeviceId(@Body Device device);
+
+    @GET("/posts")
+    @Headers({"IgnoreAuth:1"})
+    Observable<List<PostTest>> getPosts();
 }

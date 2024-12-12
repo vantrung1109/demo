@@ -15,7 +15,7 @@ android {
 
 //        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "BASE_URL", "\"https://license-api-kitplay.itz.io.vn\""
+        buildConfigField "String", "BASE_URL", "\"https://jsonplaceholder.typicode.com\""
         buildConfigField "String", "WS_URL", "\"ws://192.168.201.155:8989/ws\""
         buildConfigField "String", "UPDATE_URL", "\"https://update.digibes.de/qrlive/qrcode_random.txt\""
 

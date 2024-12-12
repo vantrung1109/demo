@@ -18,6 +18,7 @@ import digi.kitplay.data.download.DownloadAPI;
 import digi.kitplay.data.download.DownloadProgressListener;
 import digi.kitplay.data.model.api.ApiModelUtils;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
+import digi.kitplay.data.model.api.response.PostTest;
 import digi.kitplay.data.model.api.response.SocketResponse;
 import digi.kitplay.data.model.db.ActionEntity;
 import digi.kitplay.data.model.db.UserEntity;
@@ -30,6 +31,7 @@ import digi.kitplay.utils.FileUtils;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import retrofit2.http.POST;
 import timber.log.Timber;
 
 public class MainViewModel extends BaseViewModel {
@@ -141,7 +143,7 @@ public class MainViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(insertedId -> {
-                            Timber.tag("ActionLiveData").e("Inserted id: %d", insertedId);
+                            Timber.tag("ActionLiveData").e("[Action Inserted success] %d", insertedId);
                         }, throwable -> {
                         })
         );
@@ -153,7 +155,7 @@ public class MainViewModel extends BaseViewModel {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(isDeleted -> {
-                            Timber.tag("ObserveAction").e("Deleted: %b", isDeleted);
+                            Timber.tag("ObserveAction").e("[Action Deleted success]: %b", isDeleted);
                         }, throwable -> {
                         })
         );
@@ -164,6 +166,23 @@ public class MainViewModel extends BaseViewModel {
                 .observeForever(actionEntities -> {
                     actionsLiveData.setValue(actionEntities);
                 });
+    }
+
+    public void getListPost(MainCallback<List<PostTest>> callback) {
+        compositeDisposable.add(
+                repository.getApiService().getPosts()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(response -> {
+                            if (response != null) {
+                                Timber.e("Response: %s", response.size());
+                                callback.doSuccess(response);
+                            } else {
+                                callback.doFail();
+                            }
+                        }, callback::doError)
+        );
+
     }
 
 }

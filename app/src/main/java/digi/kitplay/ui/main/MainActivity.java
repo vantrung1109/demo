@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.content.pm.PackageInfoCompat;
+import androidx.lifecycle.Observer;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -46,6 +47,7 @@ import digi.kitplay.R;
 import digi.kitplay.data.download.Download;
 import digi.kitplay.data.download.DownloadProgressListener;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
+import digi.kitplay.data.model.api.response.PostTest;
 import digi.kitplay.data.model.db.ActionEntity;
 import digi.kitplay.databinding.ActivityMainBinding;
 import digi.kitplay.databinding.LayoutSocketDisconnectedBinding;
@@ -112,41 +114,75 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         });
 
         viewModel.observeActions();
-        observeAndProcessActions();
 
     }
 
-    public void observeAndProcessActions() {
-        viewModel.actionsLiveData.observeForever(actionEntities -> {
-            // Print action by time
-            for (int i = 0; i < actionEntities.size(); i++) {
-                int status = actionEntities.get(i).getStatus();
-                long timestamp = actionEntities.get(i).getTimestamp();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                String formattedDate = dateFormat.format(new Date(timestamp));
-                Timber.tag("ObserveAction").e("Action : Timestamp: %s, Status: %d", formattedDate, status);
-            }
 
-            // Process action
-            if (actionEntities.size() > 0) {
-                callAPI(actionEntities);
-            } else {
-                Timber.tag("ObserveAction").e("No action to process");
-            }
 
-        });
-    }
+    private Observer<List<ActionEntity>> actionObserver = actionEntities -> {
+        // Print action by time
+        for (int i = 0; i < actionEntities.size(); i++) {
+            int status = actionEntities.get(i).getStatus();
+            long timestamp = actionEntities.get(i).getTimestamp();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String formattedDate = dateFormat.format(new Date(timestamp));
+            Timber.tag("ObserveAction").e("[Action] Timestamp: %s, Status: %d", formattedDate, status);
+        }
 
+        // Process action
+        if (actionEntities.size() > 0) {
+            callAPI(actionEntities);
+        } else {
+            Timber.tag("ObserveAction").e("No action to process");
+        }
+    };
     private void callAPI(List<ActionEntity> actionEntities) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            boolean isSuccess = new Random().nextBoolean();
-            if (isSuccess) {
-                viewModel.popAction(actionEntities.get(0));
-            } else {
-                callAPI(actionEntities);
-                Timber.tag("ObserveAction").e("Failed to process action");
-            }
+            viewModel.getListPost(new MainCallback<List<PostTest>>() {
+                @Override
+                public void doError(Throwable error) {
+
+                }
+
+                @Override
+                public void doSuccess() {
+                }
+
+                @Override
+                public void doFail() {
+                    Timber.tag("State").e("[API Response] Fail");
+                    viewModel.getListPost(this);
+                }
+
+                @Override
+                public void doSuccess(List<PostTest> response) {
+                    if (response != null) {
+                        Timber.tag("State").e("[API Response] Success");
+                        viewModel.popAction(actionEntities.get(0));
+                    }
+                }
+            });
         }, 2000); // Giả lập thời gian chờ 2 giây
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Timber.d("#on start");
+        viewModel.actionsLiveData.observe(this, actionObserver);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Timber.d("#on stop");
+    }
+    @Override
+    protected void onDestroy() {
+        Timber.d("#on destroy");
+        super.onDestroy();
+        unRegisterToNetworkListener();
+        heightProvider.dismiss();
+        viewModel.actionsLiveData.removeObserver(actionObserver);
+
     }
 
     private void setupHeader() {
@@ -298,13 +334,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
 //        viewModel.startSocketTick();
     }
 
-    @Override
-    protected void onDestroy() {
-        Timber.d("#on destroy");
-        super.onDestroy();
-        unRegisterToNetworkListener();
-        heightProvider.dismiss();
-    }
+
 
     private void showLostWifi() {
         viewModel.mNetworkStatus.postValue(false);
@@ -353,10 +383,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         viewBinding.root.requestFocus();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
+
 
     @Override
     public int getLayoutId() {
