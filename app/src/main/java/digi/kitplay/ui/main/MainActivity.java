@@ -195,8 +195,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
     protected void onStart() {
         super.onStart();
         Timber.d("#on start");
-        viewModel.actionsLiveData.observeForever(actionObserver);
+//        viewModel.actionsLiveData.observeForever(actionObserver);
     }
+    @Override
+    protected void onResume() {
+        inBackground = false;
+        super.onResume();
+        Timber.d("#on resume");
+//        viewModel.startSocketTick();
+        viewModel.actionsLiveData.observe(this, actionObserver);
+
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -377,13 +387,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         viewModel.dispose();
     }
 
-    @Override
-    protected void onResume() {
-        inBackground = false;
-        super.onResume();
-        Timber.d("#on resume");
-//        viewModel.startSocketTick();
-    }
 
 
 
