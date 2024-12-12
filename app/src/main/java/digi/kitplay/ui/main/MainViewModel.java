@@ -61,8 +61,6 @@ public class MainViewModel extends BaseViewModel {
 
     public MutableLiveData<List<ActionEntity>> actionsLiveData = new MutableLiveData<>();
 
-
-
     public MainViewModel(Repository repository, MVVMApplication application) {
         super(repository, application);
     }

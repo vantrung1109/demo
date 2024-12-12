@@ -135,28 +135,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         viewModel.pushAction(actionEntity);
     }
 
-    private Observer<List<ActionEntity>> actionObserver = actionEntities -> {
-        // Print action by time
-        for (int i = 0; i < actionEntities.size(); i++) {
-            int status = actionEntities.get(i).getStatus();
-            long timestamp = actionEntities.get(i).getTimestamp();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formattedDate = dateFormat.format(new Date(timestamp));
-            Timber.tag("ObserveAction").e("[Action] Timestamp: %s, Status: %d", formattedDate, status);
-        }
-        if (actionEntities.isEmpty()) {
-            Timber.tag("ObserveAction").e("[Action] Empty");
-            return;
-        }
 
-        // Process action
-        if (!viewModel.isProcessing) {
-            ActionEntity actionEntity = actionEntities.get(0);
-            Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getType());
-            assert actionHandler != null;
-            actionHandler.accept(actionEntity);
-        }
-    };
 
     public void callPostApi(ActionEntity actionEntity) {
         // Gọi API liên quan đến "POST"
@@ -216,15 +195,39 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
     protected void onStart() {
         super.onStart();
         Timber.d("#on start");
-        viewModel.actionsLiveData.observe(this, actionObserver);
+        viewModel.actionsLiveData.observeForever(actionObserver);
     }
     @Override
     protected void onStop() {
         super.onStop();
         Timber.d("#on stop");
         viewModel.actionsLiveData.removeObserver(actionObserver);
-
     }
+    private Observer<List<ActionEntity>> actionObserver = new Observer<List<ActionEntity>>() {
+        @Override
+        public void onChanged(List<ActionEntity> actionEntities) {
+            // Print action by time
+            for (int i = 0; i < actionEntities.size(); i++) {
+                int status = actionEntities.get(i).getStatus();
+                long timestamp = actionEntities.get(i).getTimestamp();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = dateFormat.format(new Date(timestamp));
+                Timber.tag("ObserveAction").e("[Action] Timestamp: %s, Status: %d", formattedDate, status);
+            }
+            if (actionEntities.isEmpty()) {
+                Timber.tag("ObserveAction").e("[Action] Empty");
+                return;
+            }
+
+            // Process action
+            if (!viewModel.isProcessing) {
+                ActionEntity actionEntity = actionEntities.get(0);
+                Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getType());
+                assert actionHandler != null;
+                actionHandler.accept(actionEntity);
+            }
+        }
+    };
     @Override
     protected void onDestroy() {
         Timber.d("#on destroy");
