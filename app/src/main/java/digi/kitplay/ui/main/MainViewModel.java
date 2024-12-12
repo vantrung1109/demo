@@ -18,6 +18,7 @@ import digi.kitplay.data.download.DownloadAPI;
 import digi.kitplay.data.download.DownloadProgressListener;
 import digi.kitplay.data.model.api.ApiModelUtils;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
+import digi.kitplay.data.model.api.response.CommentTest;
 import digi.kitplay.data.model.api.response.PostTest;
 import digi.kitplay.data.model.api.response.SocketResponse;
 import digi.kitplay.data.model.db.ActionEntity;
@@ -58,6 +59,7 @@ public class MainViewModel extends BaseViewModel {
 
 
     public MutableLiveData<List<ActionEntity>> actionsLiveData = new MutableLiveData<>();
+
 
 
     public MainViewModel(Repository repository, MVVMApplication application) {
@@ -175,7 +177,24 @@ public class MainViewModel extends BaseViewModel {
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(response -> {
                             if (response != null) {
-                                Timber.e("Response: %s", response.size());
+                                Timber.e("Response[PO]: %s", response.size());
+                                callback.doSuccess(response);
+                            } else {
+                                callback.doFail();
+                            }
+                        }, callback::doError)
+        );
+
+    }
+
+    public void getListComments(MainCallback<List<CommentTest>> callback) {
+        compositeDisposable.add(
+                repository.getApiService().getComments()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(response -> {
+                            if (response != null) {
+                                Timber.e("Response[CM]: %s", response.size());
                                 callback.doSuccess(response);
                             } else {
                                 callback.doFail();

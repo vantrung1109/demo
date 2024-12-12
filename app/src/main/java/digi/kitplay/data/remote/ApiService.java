@@ -6,6 +6,7 @@ import digi.kitplay.data.model.api.ResponseListObj;
 import digi.kitplay.data.model.api.ResponseWrapper;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
 
+import digi.kitplay.data.model.api.response.CommentTest;
 import digi.kitplay.data.model.api.response.PostTest;
 import digi.kitplay.data.model.api.response.SocketResponse;
 import digi.kitplay.data.model.api.response.VerifyTokenResponse;
@@ -33,4 +34,8 @@ public interface ApiService {
     @GET("/posts")
     @Headers({"IgnoreAuth:1"})
     Observable<List<PostTest>> getPosts();
+
+    @GET("/posts/1/comments")
+    @Headers({"IgnoreAuth:1"})
+    Observable<List<CommentTest>> getComments();
 }

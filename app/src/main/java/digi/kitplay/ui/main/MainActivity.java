@@ -35,10 +35,13 @@ import androidx.lifecycle.Observer;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import digi.kitplay.BR;
 import digi.kitplay.BuildConfig;
@@ -47,8 +50,10 @@ import digi.kitplay.R;
 import digi.kitplay.data.download.Download;
 import digi.kitplay.data.download.DownloadProgressListener;
 import digi.kitplay.data.model.api.response.CheckUpdateResponse;
+import digi.kitplay.data.model.api.response.CommentTest;
 import digi.kitplay.data.model.api.response.PostTest;
 import digi.kitplay.data.model.db.ActionEntity;
+import digi.kitplay.data.model.db.ActionType;
 import digi.kitplay.databinding.ActivityMainBinding;
 import digi.kitplay.databinding.LayoutSocketDisconnectedBinding;
 import digi.kitplay.di.component.ActivityComponent;
@@ -98,25 +103,39 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
     //
     private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+
+    private Map<ActionType, Consumer<ActionEntity>> apiHandlers = new HashMap<>();
+    private void initializeApiHandlers() {
+        apiHandlers.put(ActionType.POST, this::callPostApi);
+        apiHandlers.put(ActionType.COMMENT, this::callCommentApi);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         // lay ssid tu share ref
         super.onCreate(savedInstanceState);
         setupHeader();
-
-        viewBinding.btnPushAction.setOnClickListener(v -> {
-            ActionEntity actionEntity = new ActionEntity();
-            actionEntity.setId(SnowFlakeIdService.getInstance().nextId());
-            actionEntity.setDescription("Action " + System.currentTimeMillis());
-            actionEntity.setStatus(0);
-            actionEntity.setTimestamp(System.currentTimeMillis());
-            viewModel.pushAction(actionEntity);
+        initializeApiHandlers();
+        viewBinding.btnGetPosts.setOnClickListener(v -> {
+            createAction(ActionType.POST);
+        });
+        viewBinding.btnGetComments.setOnClickListener(v -> {
+            createAction(ActionType.COMMENT);
         });
 
         viewModel.observeActions();
 
     }
 
+    private void createAction(ActionType actionType) {
+        ActionEntity actionEntity = new ActionEntity();
+        actionEntity.setId(SnowFlakeIdService.getInstance().nextId());
+        actionEntity.setDescription("Action " + System.currentTimeMillis());
+        actionEntity.setStatus(0);
+        actionEntity.setActionType(actionType);
+        actionEntity.setTimestamp(System.currentTimeMillis());
+        viewModel.pushAction(actionEntity);
+    }
 
 
     private Observer<List<ActionEntity>> actionObserver = actionEntities -> {
@@ -131,39 +150,74 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
 
         // Process action
         if (actionEntities.size() > 0) {
-            callAPI(actionEntities);
+            ActionEntity actionEntity = actionEntities.get(0);
+            Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getActionType());
+            if (actionHandler == null) {
+                apiHandlers.get(actionEntity.getActionType());
+                return;
+            }
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                actionHandler.accept(actionEntity);
+            }, 2000); // Giả lập thời gian chờ 2 giây
         } else {
             Timber.tag("ObserveAction").e("No action to process");
         }
     };
-    private void callAPI(List<ActionEntity> actionEntities) {
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            viewModel.getListPost(new MainCallback<List<PostTest>>() {
-                @Override
-                public void doError(Throwable error) {
 
-                }
+    public void callPostApi(ActionEntity actionEntity) {
+        // Gọi API liên quan đến "POST"
+        viewModel.getListPost(new MainCallback<List<PostTest>>() {
+            @Override
+            public void doError(Throwable error) {
+                Timber.tag("API Error").e("Error calling Post API: %s", error.getMessage());
+            }
 
-                @Override
-                public void doSuccess() {
-                }
+            @Override
+            public void doSuccess() {
 
-                @Override
-                public void doFail() {
-                    Timber.tag("State").e("[API Response] Fail");
-                    viewModel.getListPost(this);
-                }
+            }
 
-                @Override
-                public void doSuccess(List<PostTest> response) {
-                    if (response != null) {
-                        Timber.tag("State").e("[API Response] Success");
-                        viewModel.popAction(actionEntities.get(0));
-                    }
+            @Override
+            public void doSuccess(List<PostTest> posts) {
+                if (posts != null) {
+                    viewModel.popAction(actionEntity);
                 }
-            });
-        }, 2000); // Giả lập thời gian chờ 2 giây
+            }
+
+            @Override
+            public void doFail() {
+                Timber.tag("State").e("[API Response] Fail");
+            }
+        });
     }
+
+    public void callCommentApi(ActionEntity actionEntity) {
+        // Gọi API liên quan đến "COMMENT"
+        viewModel.getListComments(new MainCallback<List<CommentTest>>() {
+            @Override
+            public void doError(Throwable error) {
+                Timber.tag("API Error").e("Error calling Comment API: %s", error.getMessage());
+            }
+
+            @Override
+            public void doSuccess() {
+
+            }
+
+            @Override
+            public void doSuccess(List<CommentTest> comments) {
+                if (comments != null) {
+                    viewModel.popAction(actionEntity);
+                }
+            }
+
+            @Override
+            public void doFail() {
+                Timber.tag("State").e("[API Response] Fail");
+            }
+        });
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
