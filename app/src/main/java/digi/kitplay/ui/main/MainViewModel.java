@@ -57,6 +57,7 @@ public class MainViewModel extends BaseViewModel {
     public ObservableField<String> md5 = new ObservableField<>();
     public ObservableField<String> subMd5 = new ObservableField<>();
 
+    public Boolean isProcessing = false;
 
     public MutableLiveData<List<ActionEntity>> actionsLiveData = new MutableLiveData<>();
 
@@ -171,6 +172,7 @@ public class MainViewModel extends BaseViewModel {
     }
 
     public void getListPost(MainCallback<List<PostTest>> callback) {
+        isProcessing = true;
         compositeDisposable.add(
                 repository.getApiService().getPosts()
                         .subscribeOn(Schedulers.io())
@@ -178,7 +180,10 @@ public class MainViewModel extends BaseViewModel {
                         .subscribe(response -> {
                             if (response != null) {
                                 Timber.e("Response[PO]: %s", response.size());
-                                callback.doSuccess(response);
+                                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                                    callback.doSuccess(response);
+                                    isProcessing = false;
+                                }, 5000);
                             } else {
                                 callback.doFail();
                             }
@@ -188,6 +193,7 @@ public class MainViewModel extends BaseViewModel {
     }
 
     public void getListComments(MainCallback<List<CommentTest>> callback) {
+        isProcessing = true;
         compositeDisposable.add(
                 repository.getApiService().getComments()
                         .subscribeOn(Schedulers.io())
@@ -196,6 +202,7 @@ public class MainViewModel extends BaseViewModel {
                             if (response != null) {
                                 Timber.e("Response[CM]: %s", response.size());
                                 callback.doSuccess(response);
+                                isProcessing = false;
                             } else {
                                 callback.doFail();
                             }

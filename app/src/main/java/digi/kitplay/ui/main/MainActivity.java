@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -100,9 +101,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
     private boolean inBackground = false;
     private boolean lockScan = false;
     //
-    private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
-
 
     private Map<String, Consumer<ActionEntity>> apiHandlers = new HashMap<>();
     private void initializeApiHandlers() {
@@ -136,7 +135,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         viewModel.pushAction(actionEntity);
     }
 
-
     private Observer<List<ActionEntity>> actionObserver = actionEntities -> {
         // Print action by time
         for (int i = 0; i < actionEntities.size(); i++) {
@@ -146,16 +144,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
             String formattedDate = dateFormat.format(new Date(timestamp));
             Timber.tag("ObserveAction").e("[Action] Timestamp: %s, Status: %d", formattedDate, status);
         }
+        if (actionEntities.isEmpty()) {
+            Timber.tag("ObserveAction").e("[Action] Empty");
+            return;
+        }
 
         // Process action
-        if (actionEntities.size() > 0) {
+        if (!viewModel.isProcessing) {
             ActionEntity actionEntity = actionEntities.get(0);
             Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getType());
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                actionHandler.accept(actionEntity);
-            }, 2000);
-        } else {
-            Timber.tag("ObserveAction").e("No action to process");
+            assert actionHandler != null;
+            actionHandler.accept(actionEntity);
         }
     };
 
@@ -223,6 +222,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
     protected void onStop() {
         super.onStop();
         Timber.d("#on stop");
+        viewModel.actionsLiveData.removeObserver(actionObserver);
+
     }
     @Override
     protected void onDestroy() {
@@ -230,8 +231,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         super.onDestroy();
         unRegisterToNetworkListener();
         heightProvider.dismiss();
-        viewModel.actionsLiveData.removeObserver(actionObserver);
-
     }
 
     private void setupHeader() {
