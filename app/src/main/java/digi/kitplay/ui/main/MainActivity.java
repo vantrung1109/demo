@@ -203,7 +203,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         super.onResume();
         Timber.d("#on resume");
 //        viewModel.startSocketTick();
-        viewModel.actionsLiveData.observeForever( actionObserver);
+        viewModel.actionsLiveData.observe(this, actionObserver);
 
     }
 
