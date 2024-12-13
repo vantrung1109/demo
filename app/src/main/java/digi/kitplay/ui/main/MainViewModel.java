@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import digi.kitplay.BuildConfig;
 import digi.kitplay.MVVMApplication;
@@ -174,14 +175,31 @@ public class MainViewModel extends BaseViewModel {
         compositeDisposable.add(
                 repository.getApiService().getPosts()
                         .subscribeOn(Schedulers.io())
+                        .delay(5, TimeUnit.SECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(response -> {
                             if (response != null) {
                                 Timber.e("Response[PO]: %s", response.size());
-                                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                                    callback.doSuccess(response);
-                                    isProcessing = false;
-                                }, 5000);
+                                callback.doSuccess(response);
+                                isProcessing = false;
+                            } else {
+                                callback.doFail();
+                            }
+                        }, callback::doError)
+        );
+
+    }
+    public void getPost(MainCallback<PostTest> callback) {
+        isProcessing = true;
+        compositeDisposable.add(
+                repository.getApiService().getPost()
+                        .subscribeOn(Schedulers.io())
+                        .delay(5, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(response -> {
+                            if (response != null) {
+                                callback.doSuccess(response);
+                                isProcessing = false;
                             } else {
                                 callback.doFail();
                             }

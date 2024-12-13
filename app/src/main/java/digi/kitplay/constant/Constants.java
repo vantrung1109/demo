@@ -80,6 +80,7 @@ public class Constants {
 
     }
 
+    public static String ACTION_GET_L_POST = "ACTION_GET_L_POST";
     public static String ACTION_GET_POST = "ACTION_GET_POST";
     public static String ACTION_GET_COMMENT = "ACTION_GET_COMMENT";
 }

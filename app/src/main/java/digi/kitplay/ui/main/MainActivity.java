@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -105,7 +106,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
 
     private Map<String, Consumer<ActionEntity>> apiHandlers = new HashMap<>();
     private void initializeApiHandlers() {
-        apiHandlers.put(Constants.ACTION_GET_POST, this::callPostApi);
+        apiHandlers.put(Constants.ACTION_GET_POST, this::callOnePostApi);
         apiHandlers.put(Constants.ACTION_GET_COMMENT, this::callCommentApi);
     }
     @Override
@@ -135,7 +136,32 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         viewModel.pushAction(actionEntity);
     }
 
+    public void callOnePostApi(ActionEntity actionEntity) {
+        // Gọi API liên quan đến "POST"
+        viewModel.getPost(new MainCallback<PostTest>() {
+            @Override
+            public void doError(Throwable error) {
+                Timber.tag("API Error").e("Error calling Post API: %s", error.getMessage());
+            }
 
+            @Override
+            public void doSuccess() {
+
+            }
+
+            @Override
+            public void doSuccess(PostTest post) {
+                if (post != null) {
+                    viewModel.popAction(actionEntity);
+                }
+            }
+
+            @Override
+            public void doFail() {
+                Timber.tag("State").e("[API Response] Fail");
+            }
+        });
+    }
 
     public void callPostApi(ActionEntity actionEntity) {
         // Gọi API liên quan đến "POST"
@@ -196,6 +222,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         super.onStart();
         Timber.d("#on start");
 //        viewModel.actionsLiveData.observeForever(actionObserver);
+
     }
     @Override
     protected void onResume() {
@@ -204,7 +231,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         Timber.d("#on resume");
 //        viewModel.startSocketTick();
         viewModel.actionsLiveData.observe(this, actionObserver);
-
+        if (viewModel.actionsLiveData.getValue() != null) {
+            processNextAction(viewModel.actionsLiveData.getValue());
+        }
     }
 
     @Override
@@ -231,13 +260,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
 
             // Process action
             if (!viewModel.isProcessing) {
-                ActionEntity actionEntity = actionEntities.get(0);
-                Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getType());
-                assert actionHandler != null;
-                actionHandler.accept(actionEntity);
+                processNextAction(actionEntities);
             }
         }
     };
+
+    private void processNextAction(List<ActionEntity> actionEntities) {
+        ActionEntity actionEntity = actionEntities.get(0);
+        Consumer<ActionEntity> actionHandler = apiHandlers.get(actionEntity.getType());
+        assert actionHandler != null;
+        actionHandler.accept(actionEntity);
+    }
+
     @Override
     protected void onDestroy() {
         Timber.d("#on destroy");
@@ -313,9 +347,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
             }
         });
     }
-
-
-
 
     ConnectivityManager connectivityManager;
     ConnectivityManager.NetworkCallback networkCallback;

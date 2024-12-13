@@ -35,6 +35,10 @@ public interface ApiService {
     @Headers({"IgnoreAuth:1"})
     Observable<List<PostTest>> getPosts();
 
+    @GET("/posts/1")
+    @Headers({"IgnoreAuth:1"})
+    Observable<PostTest> getPost();
+
     @GET("/posts/1/comments")
     @Headers({"IgnoreAuth:1"})
     Observable<List<CommentTest>> getComments();
